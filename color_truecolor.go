@@ -1,8 +1,8 @@
 package lol
 
 import (
-	"math"
 	"fmt"
+	"math"
 )
 
 type truecolor struct {
