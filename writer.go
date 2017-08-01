@@ -3,7 +3,7 @@ package lol
 import (
 	"fmt"
 	"io"
-	"math"
+	"os"
 	"strings"
 )
 
@@ -13,27 +13,62 @@ const (
 	seed   = 0
 )
 
-type color struct {
-	R, G, B uint8
-}
-
-func (c *color) rainbow(freq float64, i float64) {
-	c.R = uint8(math.Floor(math.Sin(freq*i+0)*127)) + 128
-	c.G = uint8(math.Floor(math.Sin(freq*i+2.0*math.Pi/3.0)*127)) + 128
-	c.B = uint8(math.Floor(math.Sin(freq*i+4.0*math.Pi/3.0)*127)) + 128
-}
-
-func (c *color) format() []byte {
-	return []byte(fmt.Sprintf("\x1b[38;2;%d;%d;%dm", c.R, c.G, c.B))
-}
+const (
+	ColorModeTrueColor = iota
+	ColorMode256
+	ColorMode0
+)
 
 // LolWriter writes a little lol-er.
 type Writer struct {
-	Output  io.Writer
-	lineIdx int
-	origin  int
+	Output    io.Writer
+	ColorMode int
+	lineIdx   int
+	origin    int
 }
 
+// writeRaw will write a lol'd s to the underlying writer.  It does no line
+// detection.
+func (w *Writer) writeRaw(s string) (int, error) {
+	c, err := w.getColorer()
+	if err != nil {
+		return -1, err
+	}
+	nWritten := 0
+	for _, r := range s {
+		c.rainbow(freq, float64(w.origin)+float64(w.lineIdx)/spread)
+		_, err := w.Output.Write(c.format())
+		if err != nil {
+			return nWritten, err
+		}
+		n, err := w.Output.Write([]byte(string(r)))
+		if err != nil {
+			return nWritten, err
+		}
+		_, err = w.Output.Write(c.reset())
+		if err != nil {
+			return nWritten, err
+		}
+		nWritten += n
+		w.lineIdx++
+	}
+	return nWritten, nil
+}
+
+func (w *Writer) getColorer() (colorer, error) {
+	switch w.ColorMode {
+	case ColorModeTrueColor:
+		return newTruecolorColorer(), nil
+	case ColorMode256:
+		return New256Colorer(), nil
+	case ColorMode0:
+		return New0Colorer(), nil
+	default:
+		return nil, fmt.Errorf("Invalid colorer: [%d]", w.ColorMode)
+	}
+}
+
+// Write will write a byte slice to the Writer
 func (w *Writer) Write(p []byte) (int, error) {
 	nWritten := 0
 	ss := strings.Split(string(p), "\n")
@@ -63,23 +98,24 @@ func (w *Writer) Write(p []byte) (int, error) {
 	return nWritten, nil
 }
 
-// writeRaw will write a lol'd s to the underlying writer.  It does no line
-// detection.
-func (w *Writer) writeRaw(s string) (int, error) {
-	var c color
-	nWritten := 0
-	for _, r := range s {
-		c.rainbow(freq, float64(w.origin)+float64(w.lineIdx)/spread)
-		_, err := w.Output.Write(c.format())
-		if err != nil {
-			return nWritten, err
-		}
-		n, err := w.Output.Write([]byte(string(r)))
-		if err != nil {
-			return nWritten, err
-		}
-		nWritten += n
-		w.lineIdx++
+func NewLolWriter() *Writer {
+	colorMode := ColorMode256 // Default to 256 because there is no way to detect Truecolor
+	if !hasColors() {
+		colorMode = ColorMode0
 	}
-	return nWritten, nil
+	return &Writer{
+		Output:    os.Stdout,
+		ColorMode: colorMode,
+	}
+}
+
+func NewTruecolorLolWriter() *Writer {
+	colorMode := ColorModeTrueColor // Use truecolor here as the user explicitly opted into it
+	if !hasColors() {
+		colorMode = ColorMode0
+	}
+	return &Writer{
+		Output:    os.Stdout,
+		ColorMode: colorMode,
+	}
 }
