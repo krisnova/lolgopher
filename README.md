@@ -3,6 +3,7 @@ Rainbow Writer implementation for Golang
 
 Based on https://github.com/busyloop/lolcat.
 
+<img src="https://github.com/ashleymcnamara/gophers/blob/master/NERDY.png" width="60"> Proudly packaged with Golang [dep](https://github.com/golang/dep)
 
 ## Installing
 
