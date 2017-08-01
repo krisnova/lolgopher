@@ -55,6 +55,7 @@ func (w *Writer) writeRaw(s string) (int, error) {
 	return nWritten, nil
 }
 
+// getColorer will attempt to map the defined color mode, to a colorer{}
 func (w *Writer) getColorer() (colorer, error) {
 	switch w.ColorMode {
 	case ColorModeTrueColor:
@@ -98,8 +99,9 @@ func (w *Writer) Write(p []byte) (int, error) {
 	return nWritten, nil
 }
 
-func NewLolWriter() *Writer {
-	colorMode := ColorMode256 // Default to 256 because there is no way to detect Truecolor
+// NewLolWriter will return a new io.Writer with a default ColorMode of 256
+func NewLolWriter() io.Writer {
+	colorMode := ColorMode256
 	if !hasColors() {
 		colorMode = ColorMode0
 	}
@@ -109,8 +111,9 @@ func NewLolWriter() *Writer {
 	}
 }
 
-func NewTruecolorLolWriter() *Writer {
-	colorMode := ColorModeTrueColor // Use truecolor here as the user explicitly opted into it
+// NewTruecolorLolWriter will return a new io.Writer with a default ColorMode of truecolor
+func NewTruecolorLolWriter() io.Writer {
+	colorMode := ColorModeTrueColor
 	if !hasColors() {
 		colorMode = ColorMode0
 	}

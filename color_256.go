@@ -21,26 +21,13 @@ func (c *color256) format() []byte {
 	if c.R == c.G && c.G == c.B && int(c.R) > 232 {
 		return []byte(fmt.Sprintf("\x1b[38;5;%dm", int(c.R)))
 	}
+
+	// Math for 256: We use the closest value possible
 	r6 := (uint16(c.R) * 3) / 255
 	g6 := (uint16(c.G) * 3) / 255
 	b6 := (uint16(c.B) * 3) / 255
 	i := 36*r6 + 6*g6 + b6
 	return []byte(fmt.Sprintf("\x1b[38;5;%dm", i))
-}
-
-func zip(lists ...[]int) func() []int {
-	zip := make([]int, len(lists))
-	i := 0
-	return func() []int {
-		for j := range lists {
-			if i >= len(lists[j]) {
-				return nil
-			}
-			zip[j] = lists[j][i]
-		}
-		i++
-		return zip
-	}
 }
 
 func (c *color256) reset() []byte {

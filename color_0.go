@@ -1,7 +1,5 @@
 package lol
 
-import ()
-
 type color0 struct {
 	R, G, B uint8
 }
