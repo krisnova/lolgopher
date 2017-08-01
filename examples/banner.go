@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	w := &lol.Writer{Output: os.Stdout}
+	w := &lol.Writer{Output: os.Stdout, ColorMode: lol.ColorMode256}
 	fmt.Fprintln(w, "This is a test of the emergency LOL system...")
-	w.Write([]byte(banner.PrintS("lololololol")))
+	w.Write([]byte(banner.PrintS("lolololololololololol")))
 }
