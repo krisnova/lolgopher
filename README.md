@@ -20,3 +20,17 @@ $ go get github.com/kris-nova/lolgopher
 cd $GOPATH/src/github.com/kris-nova/lolgopher
 go install .
 ```
+
+## Usage
+
+##### As a library
+
+See the `examples` directory.
+
+##### As a CLI
+
+```
+$ function kubectl() { $(which kubectl) $* | lolgopher }
+```
+
+<p align="center"><img src="img/output.png"></p>

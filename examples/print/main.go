@@ -1,7 +1,7 @@
 package main
 
 import (
-	lol "github.com/kris-nova/lolgopher"
+	"github.com/kris-nova/lolgopher/lol"
 )
 
 func main() {
