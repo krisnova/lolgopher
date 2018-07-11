@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/CrowdSurge/banner"
-	lol "github.com/kris-nova/lolgopher"
+	"github.com/kris-nova/lolgopher/lol"
 )
 
 func main() {
