@@ -1,6 +1,6 @@
 # lolgopher
 
-<p align="center"><img src="img/logo.png" width="420"></p>
+<p align="center"><img src="img/kubicorn.png" width="420"></p>
 
 Rainbow Writer implementation for Golang
 
