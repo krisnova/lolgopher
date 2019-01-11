@@ -6,13 +6,13 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mattn/go-isatty"
+	isatty "github.com/mattn/go-isatty"
 )
 
 const (
-	spread = 3.0
-	freq   = 0.1
-	seed   = 0
+	DEFAULT_SPREAD = float64(3.0)
+	DEFAULT_FREQ   = float64(0.1)
+	DEFAULT_ORIGIN = 0
 )
 
 const (
@@ -25,8 +25,10 @@ const (
 type Writer struct {
 	Output    io.Writer
 	ColorMode int
+	Freq      float64
+	Spread    float64
 	lineIdx   int
-	origin    int
+	Origin    int
 }
 
 var noColor = os.Getenv("TERM") == "dumb" || (!isatty.IsTerminal(os.Stdout.Fd()) && !isatty.IsCygwinTerminal(os.Stdout.Fd()))
@@ -40,7 +42,7 @@ func (w *Writer) writeRaw(s string) (int, error) {
 	}
 	nWritten := 0
 	for _, r := range s {
-		c.rainbow(freq, float64(w.origin)+float64(w.lineIdx)/spread)
+		c.rainbow(w.Freq, float64(w.Origin)+float64(w.lineIdx)/w.Spread)
 		_, err := w.Output.Write(c.format())
 		if err != nil {
 			return nWritten, err
@@ -88,7 +90,7 @@ func (w *Writer) Write(p []byte) (int, error) {
 		}
 		nWritten += n
 
-		// Increment the origin (line count) for each newline.  There is a
+		// Increment the Origin (line count) for each newline.  There is a
 		// newline for every item in this array except the last one.
 		if i != len(ss)-1 {
 			n, err := w.Output.Write([]byte("\n"))
@@ -96,7 +98,7 @@ func (w *Writer) Write(p []byte) (int, error) {
 				return nWritten, err
 			}
 			nWritten += n
-			w.origin++
+			w.Origin++
 			w.lineIdx = 0
 		}
 	}
@@ -109,9 +111,13 @@ func NewLolWriter() io.Writer {
 	if noColor {
 		colorMode = ColorMode0
 	}
+
 	return &Writer{
 		Output:    stdout,
 		ColorMode: colorMode,
+		Freq:      DEFAULT_FREQ,
+		Spread:    DEFAULT_SPREAD,
+		Origin:    DEFAULT_ORIGIN,
 	}
 }
 
