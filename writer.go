@@ -3,6 +3,7 @@ package lol
 import (
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"strings"
 
@@ -111,13 +112,13 @@ func NewLolWriter() io.Writer {
 	if noColor {
 		colorMode = ColorMode0
 	}
-
+	rand.Seed(time.Now().UTC().UnixNano())
 	return &Writer{
 		Output:    stdout,
 		ColorMode: colorMode,
 		Freq:      DEFAULT_FREQ,
 		Spread:    DEFAULT_SPREAD,
-		Origin:    DEFAULT_ORIGIN,
+		Origin:    rand.Intn(256),
 	}
 }
 
